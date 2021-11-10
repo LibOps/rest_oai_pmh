@@ -1,0 +1,22 @@
+{#
+
+/**
+ * @file
+ * Theme implementation for MODS mapping.
+ *
+ * Available variables:
+ * - elements: an array of field values, keyed by the element name (e.g. title) and the values are either a string if only a single value or separated by '|' if multiple
+ *
+ * @ingroup themeable
+ */
+#}
+
+<titleInfo>
+  <title>{{ elements.title }}</title>
+</titleInfo>
+<abstract>{{ elements.description }}</abstract>
+<subject>
+  {% for topic in elements.subject_topic |split (', ') %}
+    <topic>{{ topic|trim }}</topic>
+  {% endfor %}
+</subject>
