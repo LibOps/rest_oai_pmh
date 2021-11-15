@@ -2,7 +2,7 @@
 
 namespace Drupal\rest_oai_pmh\Plugin;
 
-use Drupal\Component\Plugin\PluginBase;
+use Drupal\Core\Plugin\PluginBase;
 
 /**
  * Base class for OAI Metadata Map plugins.

@@ -167,6 +167,26 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
       ];
     }
 
+    $form['view'] = [
+      '#type' => 'details',
+      '#tree' => TRUE,
+      '#open' => TRUE,
+      '#title' => $this->t('MODS View'),
+      '#attributes' => ['style' => 'max-width: 750px'],
+      '#description' => $this->t('<p>Set which view to pull information from for the MODS mapping.</p>'),
+    ];
+    $view = $config->get('mods_view');
+    $form['view']['view_machine_name'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('View Machine Name'),
+      '#default_value' => empty($view['view_machine_name']) ? '' : $view['view_machine_name'],
+    ];
+    $form['view']['view_display_name'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('View Display Name'),
+      '#default_value' => empty($view['view_display_name']) ? '' : $view['view_display_name'],
+    ];
+
     $name = $config->get('repository_name');
     $form['repository_name'] = [
       '#type' => 'textfield',
@@ -280,6 +300,7 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
     $config->set('view_displays', $view_displays)
       ->set('support_sets', $form_state->getValue('support_sets'))
       ->set('metadata_map_plugins', $form_state->getValue('mapping'))
+      ->set('mods_view', $form_state->getValue('view'))
       ->set('repository_name', $form_state->getValue('repository_name'))
       ->set('repository_email', $form_state->getValue('repository_email'))
       ->set('expiration', $form_state->getValue('expiration'))
