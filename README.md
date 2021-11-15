@@ -23,6 +23,18 @@ When you enable this module a REST endpoint will be exposed, and any user that a
 ![Screenshot of permissions field](https://www.drupal.org/files/project-images/Screen%20Shot%20on%202019-04-24%20at%2011-32-43.png)
 4. Go to the REST OAI-PMH configuration form at /admin/config/services/rest/oai-pmh and supply your system configuration.
 
+## MODS
+
+### Configure
+
+A simple view ("Article MODS Mapping") and twig template (`mods.html.twig`) using Drupal's Article content type has been included as an example.
+
+1. Modify the template `mods.html.twig` found in the module's `templates` folder to suit the specific needs for the repository.
+2. Create a View to map entity fields to their MODS element.
+    - The View should have a contextual filter for content ID.
+    - For each field you wish to display, add it to the list of fields and create a label for the field, setting it to the variable name used within the twig template.
+3. Set the View machine name and display name in the REST OAI-PMH configuration form (`/admin/config/services/rest/oai-pmh`). To use the simple View included, set the "View Machine Name" to be `article_mods_mapping` and set the "View Display Name" to be `default`.
+
 ## Future Development
 
 * The only supported OAI-PMH metadata formats currently is oai_dc. Plan to cross-walk oai_dc mapping into METS/MODS eventually
