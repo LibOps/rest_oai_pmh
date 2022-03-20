@@ -193,3 +193,20 @@ function rest_oai_pmh_update_8005() {
   $config->set('cache_technique', 'liberal_cache');
   $config->save();
 }
+
+/**
+ * Update storage config to avoid potentially using dots as config keys
+ */
+function rest_oai_pmh_update_8006() {
+  $config = \Drupal::service('config.factory')->getEditable('rest_oai_pmh.settings');
+  $old_map_plugin_config = $config->get('metadata_map_plugins');
+  $new_map_plugin_config = [];
+  foreach ($old_map_plugin_config as $prefix => $value) {
+    $new_map_plugin_config[] = [
+      'label' => $prefix,
+      'value' => $value,
+    ];
+  }
+  $config->set('metadata_map_plugins', $new_map_plugin_config);
+  $config->save();
+}

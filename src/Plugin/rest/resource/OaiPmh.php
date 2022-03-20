@@ -108,7 +108,18 @@ class OaiPmh extends ResourceBase {
       'metadata_map_plugins',
     ];
     foreach ($fields as $field) {
+      //metadata map plugins are stored in ['label' => label, 'value' => value] format
+      if ($field == 'metadata_map_plugins') {
+        $map_plugins = [];
+        if (is_array($config->get($field))) {
+          foreach($config->get($field) as $map) {
+            $map_plugins[$map['label']] = $map['value'];
+          }
+        }
+        $this->{$field} = $map_plugins;
+      } else {
       $this->{$field} = $config->get($field);
+      }
     }
 
     // Make sure the path is always set

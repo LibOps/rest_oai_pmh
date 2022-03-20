@@ -102,6 +102,20 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
     return 'rest_oai_pmh_settings_form';
   }
 
+  private function getMappingConfig(string $metadata_prefix) {
+    $mapping_config = $this->config('rest_oai_pmh.settings')
+      ->get('metadata_map_plugins');
+    if (!is_array($mapping_config)) {
+      return false;
+    }
+    foreach ($mapping_config as $map) {
+      if ($map['label'] == $metadata_prefix) {
+        return $map['value'];
+      }
+    }
+    return false;
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -156,14 +170,14 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
     foreach (\Drupal::service('plugin.manager.oai_metadata_map')->getDefinitions() as $plugin_id => $plugin_definition) {
       $mapping_prefix_plugins[$plugin_definition['metadata_format']][$plugin_id] = $plugin_definition['label']->render();
     }
-    $mapping_config = $config->get('metadata_map_plugins');
     foreach ($mapping_prefix_plugins as $metadata_prefix => $options) {
+      $mapping_config = $this->getMappingConfig($metadata_prefix);
       $form['mapping'][$metadata_prefix] = [
         '#type' => 'select',
         '#empty_value' => '',
         '#options' => $options,
         '#title' => $metadata_prefix,
-        '#default_value' => empty($mapping_config[$metadata_prefix]) ? '' : $mapping_config[$metadata_prefix],
+        '#default_value' => !$mapping_config ? '' : $mapping_config['value'],
       ];
     }
 
@@ -297,9 +311,17 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
       }
     }
 
+    $mapping = [];
+    foreach ($form_state->getValue('mapping') as $label => $value) {
+      $mapping[] = [
+        'label' => $label,
+        'value' => $value,
+      ];
+    }
+
     $config->set('view_displays', $view_displays)
       ->set('support_sets', $form_state->getValue('support_sets'))
-      ->set('metadata_map_plugins', $form_state->getValue('mapping'))
+      ->set('metadata_map_plugins', $mapping)
       ->set('mods_view', $form_state->getValue('view'))
       ->set('repository_name', $form_state->getValue('repository_name'))
       ->set('repository_email', $form_state->getValue('repository_email'))
