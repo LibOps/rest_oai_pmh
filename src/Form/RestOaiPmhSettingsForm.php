@@ -177,7 +177,7 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
         '#empty_value' => '',
         '#options' => $options,
         '#title' => $metadata_prefix,
-        '#default_value' => !$mapping_config ? '' : $mapping_config['value'],
+        '#default_value' => !$mapping_config ? '' : $mapping_config,
       ];
     }
 
