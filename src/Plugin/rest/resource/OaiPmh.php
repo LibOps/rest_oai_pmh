@@ -502,6 +502,11 @@ class OaiPmh extends ResourceBase {
     }
     $query->groupBy('r.entity_type, r.entity_id');
 
+    // XXX: Result sets can be unpredictable when limiting without an ORDER BY
+    // clause.
+    // @see: https://www.postgresql.org/docs/current/queries-limit.html.
+    $query->orderBy('r.entity_id');
+
     // If set ID was passed in URL, filter on that
     // otherwise filter on all sets as defined on set field.
     if ($set) {
