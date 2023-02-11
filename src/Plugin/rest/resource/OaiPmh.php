@@ -500,7 +500,7 @@ class OaiPmh extends ResourceBase {
       // XXX: GROUP_CONCAT() doesn't exist in PostgreSQL.
       $query->addExpression("STRING_AGG(m.set_id, ',')", 'sets');
     }
-    $query->groupBy('r.entity_type, r.entity_id');
+    $query->groupBy('r.entity_type')->groupBy('r.entity_id');
 
     // XXX: Result sets can be unpredictable when limiting without an ORDER BY
     // clause.
