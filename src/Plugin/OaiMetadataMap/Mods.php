@@ -91,6 +91,7 @@ class Mods extends OaiMetadataMapBase {
     $view->preExecute();
     $view->execute();
     $view_result = $view->result;
+    $view->render();
 
     foreach ($view_result as $row) {
       foreach ($view->field as $field) {
