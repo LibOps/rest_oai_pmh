@@ -2,7 +2,6 @@
 
 namespace Drupal\rest_oai_pmh\Plugin\QueueWorker;
 
-use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -78,11 +77,8 @@ abstract class RestOaiPmhViewsCacheBase extends QueueWorkerBase implements Conta
         ])->execute();
 
       // see what type of entity was returned by the View and set variable accordingly so we can load the entity
-      $baseEntityType = $view->getBaseEntityType();
-      if(!empty($baseEntityType)) {
-        $this->member_entity_type = $baseEntityType->id();
-        $this->member_entity_storage = \Drupal::entityTypeManager()->getStorage($this->member_entity_type);
-      }
+      $this->member_entity_type = $view->getBaseEntityType()->id();
+      $this->member_entity_storage = \Drupal::entityTypeManager()->getStorage($this->member_entity_type);
 
       // add the results returned to {rest_oai_pmh_record} + {rest_oai_pmh_member}
       $this->indexViewRecords($members);
@@ -106,36 +102,13 @@ abstract class RestOaiPmhViewsCacheBase extends QueueWorkerBase implements Conta
         'entity_type',
         'entity_id'
       ];
-
+      $merge_values = [
+        $this->member_entity_type,
+        $id
+      ];
       // load the entity, partly to ensure it exists, also to get the changed/created properties
-      if(empty($this->member_entity_type)) {
-        // If $view->getBaseEntityType returned false, it may be because this view is based on search_api_solr.
-        // To test, try to get the entity type and entity id from the row id.
-        if(preg_match("/^entity:(?<entity_type>[a-z\-_]+)\/(?<entity_id>[a-z0-9]+):(?<entity_language>[a-z]+)$/", $id, $matches)) {
-          $merge_values = [
-            $matches['entity_type'],
-            $matches['entity_id']
-          ];
-          try {
-            $member_entity_storage = \Drupal::entityTypeManager()->getStorage($matches['entity_type']);
-            if(!empty($member_entity_storage)) {
-              $entity = $member_entity_storage->load($matches['entity_id']);
-            }
-          } catch (InvalidPluginDefinitionException $e) {
-            \Drupal::logger('rest_oai_pmh')->error('Error encountered while attempting to load an entity of type "' . $matches['entity_type'] . '" with entity id "' . $matches['entity_id'] . '": ' . $e->getMessage());
-            // TODO: Should we throw an exception here? Or just carry on?
-          }
-        }
-      }
-      else {
-        // We have a base entity type from the view, so just use it.
-        $merge_values = [
-          $this->member_entity_type,
-          $id
-        ];
-        $entity = $this->member_entity_storage->load($id);
-      }
-      if (!empty($entity)) {
+      $entity = $this->member_entity_storage->load($id);
+      if ($entity) {
         // get the changed/created values, if they exist
         $changed = $entity->hasField('changed') ? $entity->changed->value : \Drupal::time()->requestTime();
         $created = $entity->hasField('created') ? $entity->created->value : $changed;
