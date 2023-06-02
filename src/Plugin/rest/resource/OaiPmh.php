@@ -108,17 +108,18 @@ class OaiPmh extends ResourceBase {
       'metadata_map_plugins',
     ];
     foreach ($fields as $field) {
-      //metadata map plugins are stored in ['label' => label, 'value' => value] format
+      // Metadata map plugins are stored in ['label' => label, 'value' => value] format.
       if ($field == 'metadata_map_plugins') {
         $map_plugins = [];
         if (is_array($config->get($field))) {
-          foreach($config->get($field) as $map) {
+          foreach ($config->get($field) as $map) {
             $map_plugins[$map['label']] = $map['value'];
           }
         }
         $this->{$field} = $map_plugins;
-      } else {
-      $this->{$field} = $config->get($field);
+      }
+      else {
+        $this->{$field} = $config->get($field);
       }
     }
 
@@ -206,7 +207,7 @@ class OaiPmh extends ResourceBase {
       // Do so now instead of waiting on Drupal cron to avoid empty results.
       if (\Drupal::database()->query('SELECT COUNT(*) FROM {rest_oai_pmh_record}')->fetchField() == 0) {
         $context = new RenderContext();
-        \Drupal::service('renderer')->executeInRenderContext($context, function() {
+        \Drupal::service('renderer')->executeInRenderContext($context, function () {
             rest_oai_pmh_rebuild_entries();
         });
       }
@@ -219,7 +220,7 @@ class OaiPmh extends ResourceBase {
     }
 
     // resumptionToken needs to be at the bottom of the request
-    // so if it exists, go take it out of the array and add it back to ensure it's the last element in the array
+    // so if it exists, go take it out of the array and add it back to ensure it's the last element in the array.
     if (!empty($this->response[$this->verb]['resumptionToken']) && count($this->response[$this->verb]['resumptionToken'])) {
       $resumption_token = $this->response[$this->verb]['resumptionToken'];
       unset($this->response[$this->verb]['resumptionToken']);
@@ -241,6 +242,9 @@ class OaiPmh extends ResourceBase {
     return $response;
   }
 
+  /**
+   *
+   */
   protected function GetRecord() {
 
     $identifier = $this->currentRequest->get('identifier');
@@ -283,6 +287,9 @@ class OaiPmh extends ResourceBase {
     }
   }
 
+  /**
+   *
+   */
   protected function Identify() {
     // Query our table to see the oldest entity exposed to OAI.
     $earliest_date = \Drupal::database()->query(
@@ -311,6 +318,9 @@ class OaiPmh extends ResourceBase {
     ];
   }
 
+  /**
+   *
+   */
   protected function ListMetadataFormats() {
     // @todo support more metadata formats
     $formats = [];
@@ -321,6 +331,9 @@ class OaiPmh extends ResourceBase {
     $this->response[$this->verb]['metadataFormat'] = $formats;
   }
 
+  /**
+   *
+   */
   protected function ListIdentifiers() {
     $entities = $this->getRecordIds();
     foreach ($entities as $entity) {
@@ -335,6 +348,9 @@ class OaiPmh extends ResourceBase {
     }
   }
 
+  /**
+   *
+   */
   protected function ListRecords() {
     $entities = $this->getRecordIds();
     foreach ($entities as $entity) {
@@ -349,6 +365,9 @@ class OaiPmh extends ResourceBase {
     }
   }
 
+  /**
+   *
+   */
   protected function ListSets() {
     // Throw an error if no Views set for OAI, or sets are explicitly not supported.
     if (count($this->view_displays) == 0 || empty($this->support_sets)) {
@@ -361,8 +380,8 @@ class OaiPmh extends ResourceBase {
     $sets = \Drupal::database()->query('SELECT set_id, label FROM {rest_oai_pmh_set}');
     foreach ($sets as $set) {
       $this->response[$this->verb]['set'][] = [
-          'setSpec' => $set->set_id,
-          'setName' => $set->label,
+        'setSpec' => $set->set_id,
+        'setName' => $set->label,
       ];
     }
   }
@@ -381,6 +400,9 @@ class OaiPmh extends ResourceBase {
     $this->error = TRUE;
   }
 
+  /**
+   *
+   */
   protected function getRecordById($identifier) {
     $record = [];
     $record['header'] = $this->getHeaderById($identifier);
@@ -389,6 +411,9 @@ class OaiPmh extends ResourceBase {
     return $record;
   }
 
+  /**
+   *
+   */
   protected function getHeaderById($identifier) {
     $header = [
       'identifier' => $identifier,
@@ -411,6 +436,9 @@ class OaiPmh extends ResourceBase {
     return $header;
   }
 
+  /**
+   *
+   */
   protected function getRecordMetadata() {
     if (empty($this->metadataPrefix)) {
       $this->metadataPrefix = $this->currentRequest->get('metadataPrefix');
@@ -432,6 +460,9 @@ class OaiPmh extends ResourceBase {
     return $result;
   }
 
+  /**
+   *
+   */
   private function getRecordIds() {
     $verb = $this->response['request']['@verb'];
     $resumption_token = $this->currentRequest->get('resumptionToken');
@@ -600,7 +631,7 @@ class OaiPmh extends ResourceBase {
     $components = explode(':', $identifier);
     $id = empty($components[2]) ? FALSE : $components[2];
     if ($id) {
-      list($entity_type, $entity_id) = explode('-', $id);
+      [$entity_type, $entity_id] = explode('-', $id);
 
       try {
         // If we need to check whether the entity is in OAI, do so
@@ -658,6 +689,9 @@ class OaiPmh extends ResourceBase {
     $this->entity = $entity && $entity->access('view') ? $entity : FALSE;
   }
 
+  /**
+   *
+   */
   protected function checkMetadataPrefix() {
     // If no metadata prefix passed into request, throw error.
     if (empty($this->metadataPrefix)) {
@@ -665,7 +699,7 @@ class OaiPmh extends ResourceBase {
     }
     // Do we have a plugin configured for it?
     elseif (!in_array($this->metadataPrefix, $this->getMetadataFormats())) {
-        $this->setError('cannotDisseminateFormat', 'The metadata format identified by the value given for the metadataPrefix argument is not supported by the item or by the repository.');
+      $this->setError('cannotDisseminateFormat', 'The metadata format identified by the value given for the metadataPrefix argument is not supported by the item or by the repository.');
     }
   }
 

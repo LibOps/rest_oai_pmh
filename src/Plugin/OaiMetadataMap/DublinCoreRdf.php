@@ -22,6 +22,9 @@ use Drupal\rest_oai_pmh\Plugin\OaiMetadataMapBase;
  */
 class DublinCoreRdf extends OaiMetadataMapBase {
 
+  /**
+   *
+   */
   public function getMetadataFormat() {
     return [
       'metadataPrefix' => 'oai_dc',
@@ -30,6 +33,9 @@ class DublinCoreRdf extends OaiMetadataMapBase {
     ];
   }
 
+  /**
+   *
+   */
   public function getMetadataWrapper() {
     return [
       'oai_dc' => [
@@ -74,7 +80,7 @@ class DublinCoreRdf extends OaiMetadataMapBase {
           // and dcterms may be prefixed accordingly
           // so just transform the property value to a standard namespace (dc)
           // to easily map properties to their respective
-          // http://purl.org/dc/elements/1.1/ value
+          // http://purl.org/dc/elements/1.1/ value.
           $property_components = explode(':', $property);
           if (isset($property_components[0]) &&
             in_array($property_components[0], ['dc11', 'dcterms'])) {
@@ -103,7 +109,7 @@ class DublinCoreRdf extends OaiMetadataMapBase {
           $index = $item->mainPropertyName();
           if (!empty($field_mapping['datatype_callback'])) {
             $callback = $field_mapping['datatype_callback']['callable'];
-            $arguments = isset($field_mapping['datatype_callback']['arguments']) ? $field_mapping['datatype_callback']['arguments'] : NULL;
+            $arguments = $field_mapping['datatype_callback']['arguments'] ?? NULL;
             $data = $item->getValue();
             $value = call_user_func($callback, $data, $arguments);
           }

@@ -15,6 +15,9 @@ use Drupal\rest_oai_pmh\Plugin\OaiCacheBase;
  */
 class Liberal extends OaiCacheBase {
 
+  /**
+   *
+   */
   public function clearCache($entity, $op) {
     $entity_type = $entity->getEntityTypeId();
     $entity_id = $entity->id();
@@ -33,7 +36,7 @@ class Liberal extends OaiCacheBase {
         $in_config = FALSE;
         // Go through.
         foreach ($oai_view_displays as $view_display) {
-          list($view_id, $display_id) = explode(':', $view_display);
+          [$view_id, $display_id] = explode(':', $view_display);
           if ($view_id == $entity_id) {
             $in_config = TRUE;
             break;
@@ -59,7 +62,7 @@ class Liberal extends OaiCacheBase {
         }
       }
       else {
-        // only rebuild cache if the entity type is exposed to OAI
+        // Only rebuild cache if the entity type is exposed to OAI.
         if (rest_oai_pmh_is_valid_entity_type($entity_type)) {
           $d_args = [
             ':entity_type' => $entity_type,

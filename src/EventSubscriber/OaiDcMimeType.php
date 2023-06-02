@@ -21,12 +21,13 @@ class OaiDcMimeType implements EventSubscriberInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
-  static function getSubscribedEvents() {
+  public static function getSubscribedEvents() {
     $events = [];
     $events[KernelEvents::REQUEST][] = ['onKernelRequest'];
 
     return $events;
   }
+
 }

@@ -22,6 +22,9 @@ use Drupal\rest_oai_pmh\Plugin\OaiMetadataMapBase;
  */
 class DefaultMap extends OaiMetadataMapBase {
 
+  /**
+   *
+   */
   public function getMetadataFormat() {
     return [
       'metadataPrefix' => 'oai_raw',
@@ -31,6 +34,9 @@ class DefaultMap extends OaiMetadataMapBase {
 
   }
 
+  /**
+   *
+   */
   public function getMetadataWrapper() {
 
     return [

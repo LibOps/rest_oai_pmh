@@ -4,6 +4,9 @@ namespace Drupal\rest_oai_pmh\Encoder;
 
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 
+/**
+ *
+ */
 class OaiDcEncoder extends XmlEncoder {
 
   const ROOT_NODE_NAME = 'xml_root_node_name';
@@ -86,4 +89,5 @@ class OaiDcEncoder extends XmlEncoder {
 
     return str_replace($search, $replace, $xml);
   }
+
 }

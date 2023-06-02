@@ -16,12 +16,12 @@
  *       "name" => "rest_oai_pmh",
  *       "directory" => "templates",
  *       "file" => "oai-default"
- *     ]
+ *     ].
  */
 function hook_rest_oai_pmh_metadata_template_alter(array &$template) {
-  // Use my module's template file to render mods metadata
+  // Use my module's template file to render mods metadata.
   if ($template['file'] == 'mods') {
-    // this would use the template path/to/mymodule/templates/mods.html.twig for mods metadata rendered in OAI-PMH
+    // This would use the template path/to/mymodule/templates/mods.html.twig for mods metadata rendered in OAI-PMH.
     $template['name'] = 'mymodule';
   }
 }

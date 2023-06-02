@@ -102,18 +102,21 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
     return 'rest_oai_pmh_settings_form';
   }
 
+  /**
+   *
+   */
   private function getMappingConfig(string $metadata_prefix) {
     $mapping_config = $this->config('rest_oai_pmh.settings')
       ->get('metadata_map_plugins');
     if (!is_array($mapping_config)) {
-      return false;
+      return FALSE;
     }
     foreach ($mapping_config as $map) {
       if ($map['label'] == $metadata_prefix) {
         return $map['value'];
       }
     }
-    return false;
+    return FALSE;
   }
 
   /**
@@ -137,7 +140,7 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
     $view_storage = $this->entityTypeManager->getStorage('view');
     $view_displays = [];
     foreach ($displays as $data) {
-      list($view_id, $display_id) = $data;
+      [$view_id, $display_id] = $data;
       $view = $view_storage->load($view_id);
       $display = $view->get('display');
       $set_name = $view_id . ':' . $display_id;
@@ -332,6 +335,9 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
     rest_oai_pmh_cache_views($rebuild_views);
   }
 
+  /**
+   *
+   */
   protected function updateRestEndpointPath($path) {
     $this->config('rest_oai_pmh.settings')
       ->set('repository_path', $path)
