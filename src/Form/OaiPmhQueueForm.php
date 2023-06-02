@@ -9,16 +9,20 @@ use Drupal\Core\Queue\QueueWorkerManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- *
+ * Rebuild the OAI cache.
  */
 class OaiPmhQueueForm extends FormBase {
 
   /**
+   * The queue factory.
+   *
    * @var \Drupal\Core\Queue\QueueFactory
    */
   protected $queueFactory;
 
   /**
+   * The queue manager.
+   *
    * @var \Drupal\Core\Queue\QueueWorkerManagerInterface
    */
   protected $queueManager;
@@ -42,14 +46,14 @@ class OaiPmhQueueForm extends FormBase {
   }
 
   /**
-   * {@inheritdoc}.
+   * {@inheritdoc}
    */
   public function getFormId() {
     return 'oai_pmh_queue_form';
   }
 
   /**
-   * {@inheritdoc}.
+   * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form['info'] = [

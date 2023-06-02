@@ -1,0 +1,62 @@
+name: Workflow Template - Lint and test
+on:
+  workflow_call:
+    inputs:
+      drupal_version:
+        required: true
+        type: string
+      php_version:
+        required: true
+        type: string
+
+jobs:
+  build:
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    name: PHP ${{ inputs.php_version }} | Drupal ${{ inputs.drupal_version }}
+    steps:
+    - id: auth
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        workload_identity_provider: ${{ secrets.GCLOUD_OIDC_POOL }}
+        create_credentials_file: true
+        service_account: ${{ secrets.GSA }}
+        token_format: 'access_token'
+
+    - uses: 'docker/login-action@v1'
+      name: 'Docker login init'
+      with:
+        registry: 'us-docker.pkg.dev'
+        username: 'oauth2accesstoken'
+        password: '${{ steps.auth.outputs.access_token }}'
+
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Run drupal image
+      run: |-
+        docker pull \
+          us-docker.pkg.dev/libops-images/shared/drupal:${{ inputs.drupal_version }}-php-${{ inputs.php_version }}-main
+        docker tag \
+          us-docker.pkg.dev/libops-images/shared/drupal:${{ inputs.drupal_version }}-php-${{ inputs.php_version }}-main \
+          drupal
+        docker run -d --name drupal \
+          -v $(pwd):/code/web/modules/custom/rest_oai_pmh \
+          -t us-docker.pkg.dev/libops-images/shared/drupal:${{ inputs.drupal_version }}-php-${{ inputs.php_version }}-main
+
+    - name: Lint
+      run: |-
+        set -eou pipefail
+
+        docker exec drupal /bin/bash -c '../vendor/bin/phpcs --standard=Drupal --extensions=php,module,inc,install,test,profile,theme,css modules/custom'
+
+    - name: Install drupal + module
+      run: |-
+        set -eou pipefail
+
+        docker exec drupal /bin/bash -c '../vendor/bin/drush si --db-url=sqlite://../../public/.ht.sqlite --yes'
+        docker exec drupal /bin/bash -c '../vendor/bin/drush en rest_oai_pmh'
+        docker exec drupal /bin/bash -c '../vendor/bin/drush status'

@@ -23,7 +23,7 @@ use Drupal\rest_oai_pmh\Plugin\OaiMetadataMapBase;
 class DublinCoreRdf extends OaiMetadataMapBase {
 
   /**
-   *
+   * Get the top level XML for the OAI response.
    */
   public function getMetadataFormat() {
     return [
@@ -34,7 +34,7 @@ class DublinCoreRdf extends OaiMetadataMapBase {
   }
 
   /**
-   *
+   * Wrap the OAI response.
    */
   public function getMetadataWrapper() {
     return [
@@ -51,7 +51,7 @@ class DublinCoreRdf extends OaiMetadataMapBase {
    * Method to transform the provided entity into the desired metadata record.
    *
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity
-   *   the entity to transform.
+   *   The entity to transform.
    *
    * @return string
    *   rendered XML.
@@ -65,7 +65,7 @@ class DublinCoreRdf extends OaiMetadataMapBase {
     }
     $render_array['metadata_prefix'] = 'oai_dc';
     $rdf_mapping = rdf_get_mapping($entity->getEntityTypeId(), $entity->bundle());
-    $allowed_properties = $this->get_allowed_properties('oai_dc');
+    $allowed_properties = $this->getAllowedProperties('oai_dc');
     foreach ($entity->getFields() as $field_id => $fieldItemList) {
       if (!$fieldItemList->access() || $fieldItemList->isEmpty()) {
         continue;
@@ -93,7 +93,8 @@ class DublinCoreRdf extends OaiMetadataMapBase {
             $element = $property;
           }
           // DC /terms/ are mapped to their respective /elements/1.1
-          // in accordance with the oai_dc schema http://www.openarchives.org/OAI/2.0/oai_dc.xsd
+          // in accordance with the oai_dc schema
+          // http://www.openarchives.org/OAI/2.0/oai_dc.xsd
           elseif (isset($allowed_properties[$property])) {
             $element = $allowed_properties[$property];
           }
@@ -130,29 +131,29 @@ class DublinCoreRdf extends OaiMetadataMapBase {
   /**
    * Helper function.
    *
-   * Return what properties we're looking for in metadata mapping modules given an OAI metadata prefix.
+   * Return what properties we're looking for in metadata mapping modules
+   *   given an OAI metadata prefix.
    */
-  public function get_allowed_properties($metadata_prefix) {
+  public function getAllowedProperties($metadata_prefix) {
     $elements = [];
     switch ($metadata_prefix) {
       case 'oai_dc':
         $elements = [
-          'dc:contributor',
-          'dc:coverage',
-          'dc:creator',
-          'dc:date',
-          'dc:description',
-          'dc:format',
-          'dc:identifier',
-          'dc:language',
-          'dc:publisher',
-          'dc:relation',
-          'dc:rights',
-          'dc:source',
-          'dc:subject',
-          'dc:title',
-          'dc:type',
-
+          'dc:contributor' => 'dc:contributor',
+          'dc:coverage' => 'dc:coverage',
+          'dc:creator' => 'dc:creator',
+          'dc:date' => 'dc:date',
+          'dc:description' => 'dc:description',
+          'dc:format' => 'dc:format',
+          'dc:identifier' => 'dc:identifier',
+          'dc:language' => 'dc:language',
+          'dc:publisher' => 'dc:publisher',
+          'dc:relation' => 'dc:relation',
+          'dc:rights' => 'dc:rights',
+          'dc:source' => 'dc:source',
+          'dc:subject' => 'dc:subject',
+          'dc:title' => 'dc:title',
+          'dc:type' => 'dc:type',
           // Plus http://purl.org/dc/terms
           // mapped to their respective http://purl.org/dc/elements/1.1/
           'dc:abstract' => 'dc:description',

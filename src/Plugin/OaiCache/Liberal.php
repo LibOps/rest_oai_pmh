@@ -6,7 +6,8 @@ use Drupal\rest_oai_pmh\Plugin\OaiCacheBase;
 
 /**
  * Liberal cache clearing strategy.
- *  Flush the cache when effected entities are added/updated/delete.
+ *
+ * Flush the cache when effected entities are added/updated/delete.
  *
  * @OaiCache(
  *  id = "liberal_cache",
@@ -16,7 +17,7 @@ use Drupal\rest_oai_pmh\Plugin\OaiCacheBase;
 class Liberal extends OaiCacheBase {
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function clearCache($entity, $op) {
     $entity_type = $entity->getEntityTypeId();
@@ -32,7 +33,7 @@ class Liberal extends OaiCacheBase {
           ':view_id' => $entity_id . '%',
         ];
         $config = \Drupal::service('config.factory')->getEditable('rest_oai_pmh.settings');
-        $oai_view_displays = $config->get('view_displays') ? : [];
+        $oai_view_displays = $config->get('view_displays') ?: [];
         $in_config = FALSE;
         // Go through.
         foreach ($oai_view_displays as $view_display) {

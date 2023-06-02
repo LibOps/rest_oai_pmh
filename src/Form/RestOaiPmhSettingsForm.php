@@ -15,7 +15,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\ProxyClass\Routing\RouteBuilder;
 
 /**
- * Class RestOaiPmhSettingsForm.
+ * Module settings admin form.
  */
 class RestOaiPmhSettingsForm extends ConfigFormBase {
 
@@ -41,7 +41,6 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
    */
   protected $pathValidator;
 
-
   /**
    * The cache discovery service.
    *
@@ -61,6 +60,16 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler service.
+   * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
+   *   The path validator service.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_discovery
+   *   The cache discovery service.
+   * @param \Drupal\Core\ProxyClass\Routing\RouteBuilder $router_builder
+   *   The router builder service.
    */
   public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, PathValidatorInterface $path_validator, CacheBackendInterface $cache_discovery, RouteBuilder $router_builder) {
     parent::__construct($config_factory);
@@ -103,7 +112,7 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
   }
 
   /**
-   *
+   * Helper function. Get the metadata mapping configuration.
    */
   private function getMappingConfig(string $metadata_prefix) {
     $mapping_config = $this->config('rest_oai_pmh.settings')
@@ -150,7 +159,7 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
     $form['data']['view_displays'] = [
       '#type' => 'checkboxes',
       '#options' => $view_displays,
-      '#default_value' => $config->get('view_displays') ? : [],
+      '#default_value' => $config->get('view_displays') ?: [],
     ];
 
     $support_sets = $config->get('support_sets');
@@ -208,7 +217,7 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
     $form['repository_name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Repository Name'),
-      '#default_value' => $name ? : $this->config('system.site')->get('name'),
+      '#default_value' => $name ?: $this->config('system.site')->get('name'),
       '#required' => TRUE,
     ];
 
@@ -216,7 +225,7 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
     $form['repository_email'] = [
       '#type' => 'email',
       '#title' => $this->t('Repository Admin E-Mail'),
-      '#default_value' => $email ? : $this->config('system.site')->get('mail'),
+      '#default_value' => $email ?: $this->config('system.site')->get('mail'),
       '#required' => TRUE,
     ];
 
@@ -224,7 +233,7 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
     $form['repository_path'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Repository Path'),
-      '#default_value' => $path ? : OaiPmh::OAI_DEFAULT_PATH,
+      '#default_value' => $path ?: OaiPmh::OAI_DEFAULT_PATH,
       '#required' => TRUE,
     ];
 
@@ -232,7 +241,7 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
     $form['expiration'] = [
       '#type' => 'number',
       '#title' => $this->t('The number of seconds until a resumption token expires'),
-      '#default_value' => $expiration ? : 3600,
+      '#default_value' => $expiration ?: 3600,
       '#required' => TRUE,
     ];
 
@@ -249,7 +258,7 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
       '#type' => 'select',
       '#options' => [],
       '#required' => TRUE,
-      '#default_value' => $cache_technique ? : 'liberal_cache',
+      '#default_value' => $cache_technique ?: 'liberal_cache',
     ];
     foreach (\Drupal::service('plugin.manager.oai_cache')->getDefinitions() as $plugin_id => $plugin_definition) {
       $form['cache_technique']['#options'][$plugin_id] = $plugin_definition['label']->render();
@@ -279,7 +288,8 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
       ) {
       $form_state->setErrorByName('repository_path', $this->t('The path you attempted to change to already exists.'));
     }
-    // If the admin changed the OAI endpoint path, invalidate cache and rebuild routes.
+    // If the admin changed the OAI endpoint path
+    // invalidate cache and rebuild routes.
     elseif ($submitted_path !== $old_path) {
       $this->updateRestEndpointPath($submitted_path);
 
@@ -336,7 +346,7 @@ class RestOaiPmhSettingsForm extends ConfigFormBase {
   }
 
   /**
-   *
+   * Helper function when updating the OAI endpoint path.
    */
   protected function updateRestEndpointPath($path) {
     $this->config('rest_oai_pmh.settings')

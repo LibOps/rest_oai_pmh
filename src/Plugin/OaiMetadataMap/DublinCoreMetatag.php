@@ -25,7 +25,7 @@ class DublinCoreMetatag extends DublinCoreRdf {
    * Method to transform the provided entity into the desired metadata record.
    *
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity
-   *   the entity to transform.
+   *   The entity to transform.
    *
    * @return string
    *   rendered XML.
@@ -38,7 +38,7 @@ class DublinCoreMetatag extends DublinCoreRdf {
       return '';
     }
     $render_array['metadata_prefix'] = 'oai_dc';
-    $allowed_properties = $this->get_allowed_properties('oai_dc');
+    $allowed_properties = $this->getAllowedProperties('oai_dc');
     $metatags = metatag_generate_entity_metatags($entity);
     // Go through all the metatags ['#type' => 'tag'] render elements.
     foreach ($metatags as $term => $metatag) {

@@ -2,6 +2,7 @@
 
 /**
  * @file
+ * Contains rest_oai_pmh.install.
  */
 
 use Drupal\Core\Database\Database;
@@ -49,7 +50,7 @@ function rest_oai_pmh_schema() {
       'set_id' => [
         'description' => 'The setSpec of the set',
         'type' => 'varchar',
-        // We could have a View ID (max length 32) + ':' + Display ID (max length 32)
+        // We could have a View ID (32 char) + ':' + Display ID (32 char)
         'length' => 65,
         'not null' => TRUE,
       ],
@@ -100,7 +101,7 @@ function rest_oai_pmh_schema() {
       ],
       'set_id' => [
         'type' => 'varchar',
-        // We could have a View ID (max length 32) + ':' + Display ID (max length 32)
+        // We could have a View ID (32 char) + ':' + Display ID (32 char)
         'length' => 65,
         'not null' => TRUE,
       ],
@@ -145,7 +146,7 @@ function rest_oai_pmh_update_8002() {
 }
 
 /**
- * Change {rest_oai_pmh_set}.limit to {rest_oai_pmh_set}.pager_limit to accomodate Postgres.
+ * Change "limit" column name to "pager_limit" to accomodate Postgres.
  */
 function rest_oai_pmh_update_8003() {
   $schema = Database::getConnection()->schema();
