@@ -1,7 +1,7 @@
 name: 'REST OAI-PMH'
 type: module
 description: 'Exposes entities as Dublin Core in an OAI-PMH endpoint using Views, REST, and a metadata mapping module of your choice'
-core_version_requirement: ^9
+core_version_requirement: ^9 || ^10
 configure: rest_oai_pmh.rest_oai_pmh_settings_form
 package: 'Web services'
 dependencies:

@@ -5,25 +5,27 @@ namespace Drupal\rest_oai_pmh\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Queue\QueueFactory;
-use Drupal\Core\Queue\QueueInterface;
-use Drupal\Core\Queue\QueueWorkerInterface;
 use Drupal\Core\Queue\QueueWorkerManagerInterface;
-use Drupal\Core\Queue\SuspendQueueException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Url;
 
+/**
+ * Rebuild the OAI cache.
+ */
 class OaiPmhQueueForm extends FormBase {
 
   /**
-   * @var QueueFactory
+   * The queue factory.
+   *
+   * @var \Drupal\Core\Queue\QueueFactory
    */
   protected $queueFactory;
 
   /**
-   * @var QueueWorkerManagerInterface
+   * The queue manager.
+   *
+   * @var \Drupal\Core\Queue\QueueWorkerManagerInterface
    */
   protected $queueManager;
-
 
   /**
    * {@inheritdoc}
@@ -44,14 +46,14 @@ class OaiPmhQueueForm extends FormBase {
   }
 
   /**
-   * {@inheritdoc}.
+   * {@inheritdoc}
    */
   public function getFormId() {
     return 'oai_pmh_queue_form';
   }
 
   /**
-   * {@inheritdoc}.
+   * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form['info'] = [
@@ -59,11 +61,11 @@ class OaiPmhQueueForm extends FormBase {
       '#markup' => $this->t('Submitting this form will rebuild your OAI-PMH entries.<br>This will automatically be done on cron, but you can perform it manually here.'),
     ];
     $form['actions']['#type'] = 'actions';
-    $form['actions']['submit'] = array(
+    $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Rebuild OAI-PMH'),
       '#button_type' => 'primary',
-    );
+    ];
 
     return $form;
   }
@@ -79,7 +81,7 @@ class OaiPmhQueueForm extends FormBase {
     while ($item = $queue->claimItem()) {
       $operations[] = [
         'rest_oai_pmh_process_queue',
-        [$item]
+        [$item],
       ];
     }
     $batch = [
@@ -93,4 +95,5 @@ class OaiPmhQueueForm extends FormBase {
 
     batch_set($batch);
   }
+
 }

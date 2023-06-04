@@ -12,23 +12,23 @@ use Drupal\Component\Annotation\Plugin;
  *
  * @Annotation
  */
-class OaiCache extends Plugin
-{
+class OaiCache extends Plugin {
 
 
-    /**
-     * The plugin ID.
-     *
-     * @var string
-     */
-    public $id;
+  /**
+   * The plugin ID.
+   *
+   * @var string
+   */
+  public $id;
 
-    /**
-     * The label of the plugin.
-     *
-     * @var \Drupal\Core\Annotation\Translation
-     *
-     * @ingroup plugin_translatable
-     */
-    public $label;
+  /**
+   * The label of the plugin.
+   *
+   * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
+   */
+  public $label;
+
 }

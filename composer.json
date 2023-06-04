@@ -3,7 +3,7 @@
   "type": "drupal-module",
   "description": "Exposes entities as Dublin Core in an OAI-PMH endpoint using Views, REST, and a metadata mapping module of your choice",
   "keywords": ["Drupal"],
-  "license": "GPL-2.0+",
+  "license": "GPL-2.0-or-later",
   "homepage": "https://www.drupal.org/project/rest_oai_pmh",
   "minimum-stability": "dev",
   "support": {

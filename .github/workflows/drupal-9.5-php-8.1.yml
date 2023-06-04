@@ -1,0 +1,13 @@
+name: Lint and test (Drupal 9.5 + PHP 8.1)
+on:
+  pull_request:
+jobs:
+  lint-test:
+    uses: ./.github/workflows/lint-test.yml
+    with:
+      drupal_version: 9.5
+      php_version: 8.1
+    permissions:
+      contents: read
+      id-token: write
+    secrets: inherit

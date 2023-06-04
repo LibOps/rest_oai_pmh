@@ -9,30 +9,31 @@ use Drupal\Core\Plugin\PluginBase;
  */
 abstract class OaiMetadataMapBase extends PluginBase implements OaiMetadataMapInterface {
 
-    /**
-     * {@inheritdoc}
-     */
-    public function build($record) {
-        $template = $this->getTemplatePath();
-        return \Drupal::service('twig')
-            ->loadTemplate($template)
-            ->render($record);
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function build($record) {
+    $templatePath = $this->getTemplatePath();
+    $twig = \Drupal::service('twig');
+    $template = floatval(\Drupal::VERSION) < 10.0 ? $twig->loadTemplate($templatePath) : $twig->load($templatePath);
 
-    /**
-     * Method to return template file path.
-     *
-     * @return string
-     *   Template file path.
-     */
-    protected function getTemplatePath() {
-        $template = $this->getPluginDefinition()['template'];
+    return $template->render($record);
+  }
 
-        \Drupal::moduleHandler()->alter('rest_oai_pmh_metadata_template', $template);
+  /**
+   * Method to return template file path.
+   *
+   * @return string
+   *   Template file path.
+   */
+  protected function getTemplatePath() {
+    $template = $this->getPluginDefinition()['template'];
 
-        return \Drupal::service('extension.path.resolver')->getPath($template['type'], $template['name'])
+    \Drupal::moduleHandler()->alter('rest_oai_pmh_metadata_template', $template);
+
+    return \Drupal::service('extension.path.resolver')->getPath($template['type'], $template['name'])
           . '/' . $template['directory']
           . '/' . $template['file'] . '.html.twig';
-    }
+  }
 
 }

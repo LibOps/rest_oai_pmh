@@ -22,6 +22,9 @@ use Drupal\rest_oai_pmh\Plugin\OaiMetadataMapBase;
  */
 class DefaultMap extends OaiMetadataMapBase {
 
+  /**
+   * Get the top level XML for the OAI response.
+   */
   public function getMetadataFormat() {
     return [
       'metadataPrefix' => 'oai_raw',
@@ -31,6 +34,9 @@ class DefaultMap extends OaiMetadataMapBase {
 
   }
 
+  /**
+   * Wrap the OAI response.
+   */
   public function getMetadataWrapper() {
 
     return [
@@ -42,7 +48,7 @@ class DefaultMap extends OaiMetadataMapBase {
    * Method to transform the provided entity into the desired metadata record.
    *
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity
-   *   the entity to transform.
+   *   Tthe entity to transform.
    *
    * @return string
    *   rendered XML.

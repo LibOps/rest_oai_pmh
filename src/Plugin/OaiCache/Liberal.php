@@ -6,7 +6,8 @@ use Drupal\rest_oai_pmh\Plugin\OaiCacheBase;
 
 /**
  * Liberal cache clearing strategy.
- *  Flush the cache when effected entities are added/updated/delete.
+ *
+ * Flush the cache when effected entities are added/updated/delete.
  *
  * @OaiCache(
  *  id = "liberal_cache",
@@ -15,6 +16,9 @@ use Drupal\rest_oai_pmh\Plugin\OaiCacheBase;
  */
 class Liberal extends OaiCacheBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function clearCache($entity, $op) {
     $entity_type = $entity->getEntityTypeId();
     $entity_id = $entity->id();
@@ -29,11 +33,11 @@ class Liberal extends OaiCacheBase {
           ':view_id' => $entity_id . '%',
         ];
         $config = \Drupal::service('config.factory')->getEditable('rest_oai_pmh.settings');
-        $oai_view_displays = $config->get('view_displays') ? : [];
+        $oai_view_displays = $config->get('view_displays') ?: [];
         $in_config = FALSE;
         // Go through.
         foreach ($oai_view_displays as $view_display) {
-          list($view_id, $display_id) = explode(':', $view_display);
+          [$view_id, $display_id] = explode(':', $view_display);
           if ($view_id == $entity_id) {
             $in_config = TRUE;
             break;
@@ -59,7 +63,7 @@ class Liberal extends OaiCacheBase {
         }
       }
       else {
-        // only rebuild cache if the entity type is exposed to OAI
+        // Only rebuild cache if the entity type is exposed to OAI.
         if (rest_oai_pmh_is_valid_entity_type($entity_type)) {
           $d_args = [
             ':entity_type' => $entity_type,

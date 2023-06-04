@@ -1,6 +1,12 @@
 <?php
 
+/**
+ * @file
+ * Contains rest_oai_pmh.install.
+ */
+
 use Drupal\Core\Database\Database;
+
 /**
  * Implements hook_schema().
  */
@@ -44,7 +50,7 @@ function rest_oai_pmh_schema() {
       'set_id' => [
         'description' => 'The setSpec of the set',
         'type' => 'varchar',
-        // we could have a View ID (max length 32) + ':' + Display ID (max length 32)
+        // We could have a View ID (32 char) + ':' + Display ID (32 char)
         'length' => 65,
         'not null' => TRUE,
       ],
@@ -95,7 +101,7 @@ function rest_oai_pmh_schema() {
       ],
       'set_id' => [
         'type' => 'varchar',
-        // we could have a View ID (max length 32) + ':' + Display ID (max length 32)
+        // We could have a View ID (32 char) + ':' + Display ID (32 char)
         'length' => 65,
         'not null' => TRUE,
       ],
@@ -107,7 +113,7 @@ function rest_oai_pmh_schema() {
 }
 
 /**
- * Add the necessary tables to store OAI-PMH data
+ * Add the necessary tables to store OAI-PMH data.
  */
 function rest_oai_pmh_update_8001() {
   $schema = Database::getConnection()->schema();
@@ -120,7 +126,7 @@ function rest_oai_pmh_update_8001() {
 }
 
 /**
- * Update the set_id field length
+ * Update the set_id field length.
  */
 function rest_oai_pmh_update_8002() {
   $schema = Database::getConnection()->schema();
@@ -132,7 +138,7 @@ function rest_oai_pmh_update_8002() {
   ];
   $tables = [
     'rest_oai_pmh_set',
-    'rest_oai_pmh_member'
+    'rest_oai_pmh_member',
   ];
   foreach ($tables as $table) {
     $schema->changeField($table, $field_name, $field_name, $field);
@@ -140,7 +146,7 @@ function rest_oai_pmh_update_8002() {
 }
 
 /**
- * Change {rest_oai_pmh_set}.limit to {rest_oai_pmh_set}.pager_limit to accomodate Postgres
+ * Change "limit" column name to "pager_limit" to accomodate Postgres.
  */
 function rest_oai_pmh_update_8003() {
   $schema = Database::getConnection()->schema();
@@ -164,29 +170,28 @@ function rest_oai_pmh_update_8003() {
   }
 }
 
-
 /**
- * Update storage config for new plugin storage
+ * Update storage config for new plugin storage.
  */
 function rest_oai_pmh_update_8004() {
   $config = \Drupal::service('config.factory')->getEditable('rest_oai_pmh.settings');
-  switch($config->get('mapping_source')) {
+  switch ($config->get('mapping_source')) {
     case 'metatag_dc':
       $mapping_source = 'dublin_core_metatag';
       break;
+
     default:
       $mapping_source = 'dublin_core_rdf';
   }
 
   $config->set('metadata_map_plugins', [
-    'oai_dc' => $mapping_source
+    'oai_dc' => $mapping_source,
   ]);
   $config->save();
 }
 
-
 /**
- * Update storage config for new cache plugin storage
+ * Update storage config for new cache plugin storage.
  */
 function rest_oai_pmh_update_8005() {
   $config = \Drupal::service('config.factory')->getEditable('rest_oai_pmh.settings');
@@ -195,7 +200,7 @@ function rest_oai_pmh_update_8005() {
 }
 
 /**
- * Update storage config to avoid potentially using dots as config keys
+ * Update storage config to avoid potentially using dots as config keys.
  */
 function rest_oai_pmh_update_8006() {
   $config = \Drupal::service('config.factory')->getEditable('rest_oai_pmh.settings');

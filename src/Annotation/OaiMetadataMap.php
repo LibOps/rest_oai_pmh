@@ -37,4 +37,5 @@ class OaiMetadataMap extends Plugin {
    * @var string
    */
   public $metadata_format;
+
 }
