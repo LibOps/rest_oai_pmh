@@ -13,10 +13,11 @@ abstract class OaiMetadataMapBase extends PluginBase implements OaiMetadataMapIn
    * {@inheritdoc}
    */
   public function build($record) {
-    $template = $this->getTemplatePath();
-    return \Drupal::service('twig')
-      ->loadTemplate($template)
-      ->render($record);
+    $templatePath = $this->getTemplatePath();
+    $twig = \Drupal::service('twig');
+    $template = floatval(\Drupal::VERSION) < 10.0 ? $twig->loadTemplate($templatePath) : $twig->load($templatePath);
+
+    return $template->render($record);
   }
 
   /**

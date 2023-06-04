@@ -285,8 +285,8 @@ class OaiPmh extends ResourceBase {
       }
       $this->response['request']['@verb'] = $this->verb = $verb;
 
-      // since we're using protected functions for the verbs
-      // the function names are in camelcase
+      // Since we're using protected functions for the verbs
+      // the function names are in camelcase.
       $f = lcfirst($verb);
       $this->{$f}();
     }
