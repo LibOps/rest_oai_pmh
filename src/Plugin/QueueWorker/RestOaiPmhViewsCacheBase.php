@@ -77,6 +77,7 @@ abstract class RestOaiPmhViewsCacheBase extends QueueWorkerBase implements Conta
     // Load the View and apply the display ID.
     $view = Views::getView($view_id);
     $view->setDisplay($display_id);
+    $view->getDisplay()->setOption('entity_reference_options', ['limit' => $view->getItemsPerPage()]);
     if (!is_null($offset)) {
       $view->setOffset($offset);
     }
