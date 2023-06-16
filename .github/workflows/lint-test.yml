@@ -47,11 +47,17 @@ jobs:
           -v $(pwd):/code/web/modules/custom/rest_oai_pmh \
           -t us-docker.pkg.dev/libops-images/shared/drupal:${{ inputs.drupal_version }}-php-${{ inputs.php_version }}-main
 
-    - name: Lint
+    - name: Lint (phpcs)
       run: |-
         set -eou pipefail
 
         docker exec drupal /bin/bash -c '../vendor/bin/phpcs --standard=Drupal --extensions=php,module,inc,install,test,profile,theme,css modules/custom'
+
+    - name: Lint (drupal-check)
+      run: |-
+        set -eou pipefail
+
+        docker exec -w /code drupal /bin/bash -c 'php vendor/bin/drupal-check web/modules/custom'
 
     - name: Install drupal + module
       run: |-
