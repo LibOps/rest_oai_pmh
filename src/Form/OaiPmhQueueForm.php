@@ -40,9 +40,9 @@ class OaiPmhQueueForm extends FormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('queue'),
-      $container->get('plugin.manager.queue_worker')
-    );
+          $container->get('queue'),
+          $container->get('plugin.manager.queue_worker')
+      );
   }
 
   /**

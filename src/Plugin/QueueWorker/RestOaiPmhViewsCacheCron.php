@@ -11,4 +11,5 @@ namespace Drupal\rest_oai_pmh\Plugin\QueueWorker;
  *   cron = {"time" = 60}
  * )
  */
-class RestOaiPmhViewsCacheCron extends RestOaiPmhViewsCacheBase {}
+class RestOaiPmhViewsCacheCron extends RestOaiPmhViewsCacheBase {
+}

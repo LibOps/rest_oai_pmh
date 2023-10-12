@@ -67,21 +67,21 @@ class Mods extends OaiMetadataMapBase {
     $view_info = $config->get('mods_view');
     if (empty($view_info['view_machine_name'])) {
       \Drupal::logger('mods')->warning(
-        $this->t("View machine name not set.")
-      );
+            $this->t("View machine name not set.")
+        );
       return '';
     }
     $view = Views::getView($view_info['view_machine_name']);
     if (!isset($view)) {
       \Drupal::logger('mods')->warning(
-        $this->t("View machine name not valid.")
-      );
+            $this->t("View machine name not valid.")
+        );
       return '';
     }
     if (!$view->access($view_info['view_display_name'])) {
       \Drupal::logger('mods')->warning(
-        $this->t("View display name not valid or not set.")
-      );
+            $this->t("View display name not valid or not set.")
+        );
       return '';
     }
 

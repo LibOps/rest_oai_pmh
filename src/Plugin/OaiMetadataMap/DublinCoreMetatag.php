@@ -33,8 +33,8 @@ class DublinCoreMetatag extends DublinCoreRdf {
   public function transformRecord(ContentEntityInterface $entity) {
     if (!\Drupal::moduleHandler()->moduleExists('metatag_dc')) {
       \Drupal::logger('rest_oai_pmh')->warning(
-        $this->t("Can't use Metatag-based Dublin Core without enabling Metatag!")
-      );
+            $this->t("Can't use Metatag-based Dublin Core without enabling Metatag!")
+        );
       return '';
     }
     $render_array['metadata_prefix'] = 'oai_dc';

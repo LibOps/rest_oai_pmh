@@ -10,4 +10,5 @@ namespace Drupal\rest_oai_pmh\Plugin\QueueWorker;
  *   title = @Translation("REST OAI-PMH Views Cache")
  * )
  */
-class RestOaiPmhViewsCache extends RestOaiPmhViewsCacheBase {}
+class RestOaiPmhViewsCache extends RestOaiPmhViewsCacheBase {
+}

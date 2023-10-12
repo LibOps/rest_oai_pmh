@@ -59,8 +59,8 @@ class DublinCoreRdf extends OaiMetadataMapBase {
   public function transformRecord(ContentEntityInterface $entity) {
     if (!\Drupal::moduleHandler()->moduleExists('rdf')) {
       \Drupal::logger('rest_oai_pmh')->warning(
-        $this->t("Can't use RDF Mapping-based Dublin Core without the RDF module enabled!")
-      );
+            $this->t("Can't use RDF Mapping-based Dublin Core without the RDF module enabled!")
+        );
       return '';
     }
     $render_array['metadata_prefix'] = 'oai_dc';
@@ -82,8 +82,9 @@ class DublinCoreRdf extends OaiMetadataMapBase {
           // to easily map properties to their respective
           // http://purl.org/dc/elements/1.1/ value.
           $property_components = explode(':', $property);
-          if (isset($property_components[0]) &&
-            in_array($property_components[0], ['dc11', 'dcterms'])) {
+          if (isset($property_components[0])
+                && in_array($property_components[0], ['dc11', 'dcterms'])
+            ) {
             $property_components[0] = 'dc';
             $property = implode(':', $property_components);
           }

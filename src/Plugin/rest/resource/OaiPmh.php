@@ -126,6 +126,55 @@ class OaiPmh extends ResourceBase {
   private $expiration;
 
   /**
+   * Object used to stored metadata about an OAI entity in current response.
+   *
+   * @var object
+   */
+  private $oaiEntity;
+
+  /**
+   * The metadataPrefix GET parameter from the current request.
+   *
+   * @var string
+   */
+  private $metadataPrefix;
+
+  /**
+   * The resumption token ID that will be returned in the current response.
+   *
+   * @var int
+   */
+  private $nextTokenId;
+
+  /**
+   * Kv store to get the current rest_oai_pmh.resumption_token.
+   *
+   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   */
+  private $keyValueStore;
+
+  /**
+   * Module responsible for mapping Drupal fields to a metadata schema.
+   *
+   * @var string
+   */
+  private $metadataMapPlugins;
+
+  /**
+   * How OAI maps Drupal fields.
+   *
+   * @var string
+   */
+  private $mappingSource;
+
+  /**
+   * Whether this OAI endpoint support sets.
+   *
+   * @var bool
+   */
+  private $supportSets;
+
+  /**
    * Constructs a new OaiPmh object.
    *
    * @param array $configuration
@@ -148,15 +197,16 @@ class OaiPmh extends ResourceBase {
    *   A module handler instance.
    */
   public function __construct(
-    array $configuration,
-    $plugin_id,
-    $plugin_definition,
-    array $serializer_formats,
-    ImmutableConfig $config,
-    LoggerInterface $logger,
-    AccountProxyInterface $current_user,
-    Request $currentRequest,
-    ModuleHandlerInterface $module_handler) {
+        array $configuration,
+        $plugin_id,
+        $plugin_definition,
+        array $serializer_formats,
+        ImmutableConfig $config,
+        LoggerInterface $logger,
+        AccountProxyInterface $current_user,
+        Request $currentRequest,
+        ModuleHandlerInterface $module_handler
+    ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
 
     $this->currentUser = $current_user;
@@ -214,16 +264,16 @@ class OaiPmh extends ResourceBase {
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->getParameter('serializer.formats'),
-      $container->get('config.factory')->get('rest_oai_pmh.settings'),
-      $container->get('logger.factory')->get('rest_oai_pmh'),
-      $container->get('current_user'),
-      $container->get('request_stack')->getCurrentRequest(),
-      $container->get('module_handler')
-    );
+          $configuration,
+          $plugin_id,
+          $plugin_definition,
+          $container->getParameter('serializer.formats'),
+          $container->get('config.factory')->get('rest_oai_pmh.settings'),
+          $container->get('logger.factory')->get('rest_oai_pmh'),
+          $container->get('current_user'),
+          $container->get('request_stack')->getCurrentRequest(),
+          $container->get('module_handler')
+      );
   }
 
   /**
@@ -279,9 +329,11 @@ class OaiPmh extends ResourceBase {
       // Do so now instead of waiting on Drupal cron to avoid empty results.
       if (\Drupal::database()->query('SELECT COUNT(*) FROM {rest_oai_pmh_record}')->fetchField() == 0) {
         $context = new RenderContext();
-        \Drupal::service('renderer')->executeInRenderContext($context, function () {
-            rest_oai_pmh_rebuild_entries();
-        });
+        \Drupal::service('renderer')->executeInRenderContext(
+              $context, function () {
+                  rest_oai_pmh_rebuild_entries();
+              }
+          );
       }
       $this->response['request']['@verb'] = $this->verb = $verb;
 
@@ -308,12 +360,12 @@ class OaiPmh extends ResourceBase {
 
     // @todo for now disabling cache altogether until can come up with sensible method if there is one
     $response->addCacheableDependency(
-        [
-          '#cache' => [
-            'max-age' => 0,
-          ],
-        ]
-    );
+          [
+            '#cache' => [
+              'max-age' => 0,
+            ],
+          ]
+      );
     \Drupal::service('page_cache_kill_switch')->trigger();
 
     return $response;
@@ -342,10 +394,10 @@ class OaiPmh extends ResourceBase {
     // Check to ensure the identifier is valid
     // and an entity was loaded.
     if (count($components) != 3
-        || $components[0] !== 'oai'
-        || $components[1] !== $host
-        || empty($this->entity)
-    ) {
+          || $components[0] !== 'oai'
+          || $components[1] !== $host
+          || empty($this->entity)
+      ) {
       $this->setError('idDoesNotExist', 'The value of the identifier argument is unknown or illegal in this repository.');
     }
 
@@ -370,9 +422,9 @@ class OaiPmh extends ResourceBase {
   protected function identify() {
     // Query our table to see the oldest entity exposed to OAI.
     $earliest_date = \Drupal::database()->query(
-        'SELECT MIN(created)
+          'SELECT MIN(created)
       FROM {rest_oai_pmh_record}'
-    )->fetchField();
+      )->fetchField();
 
     $this->response[$this->verb] = [
       'repositoryName' => $this->repositoryName,
@@ -414,7 +466,7 @@ class OaiPmh extends ResourceBase {
   protected function listIdentifiers() {
     $entities = $this->getRecordIds();
     foreach ($entities as $entity) {
-      $this->oai_entity = $entity;
+      $this->oaiEntity = $entity;
       $identifier = $this->buildIdentifier($entity);
       $this->loadEntity($identifier, TRUE);
       $this->response[$this->verb]['header'][] = $this->getHeaderById($identifier);
@@ -431,7 +483,7 @@ class OaiPmh extends ResourceBase {
   protected function listRecords() {
     $entities = $this->getRecordIds();
     foreach ($entities as $entity) {
-      $this->oai_entity = $entity;
+      $this->oaiEntity = $entity;
       $identifier = $this->buildIdentifier($entity);
       $this->loadEntity($identifier, TRUE);
       $this->response[$this->verb]['record'][] = $this->getRecordById($identifier);
@@ -504,8 +556,8 @@ class OaiPmh extends ResourceBase {
 
     // If sets are supported
     // print the sets this record belongs to.
-    if (!empty($this->oai_entity) && !empty($this->supportSets)) {
-      $sets = explode(',', $this->oai_entity->sets);
+    if (!empty($this->oaiEntity) && !empty($this->supportSets)) {
+      $sets = explode(',', $this->oaiEntity->sets);
       foreach ($sets as $set) {
         $header['setSpec'][] = $set;
       }
@@ -525,15 +577,15 @@ class OaiPmh extends ResourceBase {
     // Process the transformation to isolate any early rendering.
     $context = new RenderContext();
     $result = \Drupal::service('renderer')->executeInRenderContext(
-        $context, function () {
-            $mapping_plugin = $this->getMetadataPlugin($this->metadataPrefix);
-            $record = $mapping_plugin->transformRecord($this->entity);
-            $metadata = $mapping_plugin->getMetadataWrapper();
-            $wrapper_key = array_keys($metadata)[0];
-            $metadata[$wrapper_key]['metadata-xml'] = trim($record);
-            return $metadata;
-        }
-    );
+          $context, function () {
+              $mapping_plugin = $this->getMetadataPlugin($this->metadataPrefix);
+              $record = $mapping_plugin->transformRecord($this->entity);
+              $metadata = $mapping_plugin->getMetadataWrapper();
+              $wrapper_key = array_keys($metadata)[0];
+              $metadata[$wrapper_key]['metadata-xml'] = trim($record);
+              return $metadata;
+          }
+      );
     return $result;
   }
 
@@ -555,9 +607,9 @@ class OaiPmh extends ResourceBase {
       $token = $this->keyValueStore->get($resumption_token);
       // If we found a token and it's not expired, get the values needed.
       if ($token
-        && $token['expires'] > \Drupal::time()->getRequestTime()
-        && $token['verb'] == $this->verb
-      ) {
+            && $token['expires'] > \Drupal::time()->getRequestTime()
+            && $token['verb'] == $this->verb
+        ) {
         $this->metadataPrefix = $token['metadata_prefix'];
         $cursor = $token['cursor'];
         $set = $token['set'];
@@ -593,8 +645,8 @@ class OaiPmh extends ResourceBase {
       // limit // max results returned be the smallest pager size
       // for all the Views exposed to OAI.
       $end = $db_conn->driver() !== 'pgsql' ?
-         $db_conn->query('SELECT MIN(`pager_limit`) FROM {rest_oai_pmh_set}')->fetchField() :
-         $db_conn->query('SELECT MIN(pager_limit) FROM {rest_oai_pmh_set}')->fetchField();
+             $db_conn->query('SELECT MIN(`pager_limit`) FROM {rest_oai_pmh_set}')->fetchField() :
+             $db_conn->query('SELECT MIN(pager_limit) FROM {rest_oai_pmh_set}')->fetchField();
       $this->response['request']['@metadataPrefix'] = $this->metadataPrefix;
     }
 
@@ -742,27 +794,27 @@ class OaiPmh extends ResourceBase {
           $db_conn = \Drupal::database();
           if ($db_conn->driver() !== 'pgsql') {
             $in_oai_view = $db_conn->query(
-            'SELECT GROUP_CONCAT(set_id) FROM {rest_oai_pmh_record} r
+                  'SELECT GROUP_CONCAT(set_id) FROM {rest_oai_pmh_record} r
               INNER JOIN {rest_oai_pmh_member} m ON m.entity_id = r.entity_id AND m.entity_type = r.entity_type
               WHERE r.entity_id = :id
                 AND r.entity_type = :type
               GROUP BY r.entity_id', $d_args
-            )->fetchField();
+              )->fetchField();
           }
           else {
             // XXX: GROUP_CONCAT() doesn't exist in PostgreSQL.
             $in_oai_view = $db_conn->query(
-            'SELECT STRING_AGG(set_id, \',\') FROM {rest_oai_pmh_record} r
+                  'SELECT STRING_AGG(set_id, \',\') FROM {rest_oai_pmh_record} r
               INNER JOIN {rest_oai_pmh_member} m ON m.entity_id = r.entity_id AND m.entity_type = r.entity_type
               WHERE r.entity_id = :id
                 AND r.entity_type = :type
               GROUP BY r.entity_id', $d_args
-            )->fetchField();
+              )->fetchField();
           }
 
           // Store the set membership from our table
           // so we can print set membership in <header>.
-          $this->oai_entity = (object) ['sets' => $in_oai_view];
+          $this->oaiEntity = (object) ['sets' => $in_oai_view];
         }
 
         // If we're skipping the OAI check OR we didn't skip the check

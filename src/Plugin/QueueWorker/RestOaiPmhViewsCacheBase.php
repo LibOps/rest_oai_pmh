@@ -54,10 +54,10 @@ abstract class RestOaiPmhViewsCacheBase extends QueueWorkerBase implements Conta
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition
-    );
+          $configuration,
+          $plugin_id,
+          $plugin_definition
+      );
   }
 
   /**
@@ -103,11 +103,13 @@ abstract class RestOaiPmhViewsCacheBase extends QueueWorkerBase implements Conta
       ];
       $this->db->merge('rest_oai_pmh_set')
         ->keys($merge_keys, $merge_values)
-        ->fields([
-          'label' => $set_label,
-          'pager_limit' => $limit,
-          'view_display' => $view_display,
-        ])->execute();
+        ->fields(
+                [
+                  'label' => $set_label,
+                  'pager_limit' => $limit,
+                  'view_display' => $view_display,
+                ]
+            )->execute();
 
       // See what type of entity was returned by the View and
       // set variable accordingly so we can load the entity.
@@ -152,10 +154,12 @@ abstract class RestOaiPmhViewsCacheBase extends QueueWorkerBase implements Conta
         // Upsert the record into our cache table.
         $this->db->merge('rest_oai_pmh_record')
           ->keys($merge_keys, $merge_values)
-          ->fields([
-            'created' => $created,
-            'changed' => $changed,
-          ])->execute();
+          ->fields(
+                  [
+                    'created' => $created,
+                    'changed' => $changed,
+                  ]
+              )->execute();
 
         // Add this record to the respective set.
         $merge_keys[] = 'set_id';
