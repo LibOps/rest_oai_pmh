@@ -672,7 +672,6 @@ class OaiPmh extends ResourceBase {
     // If set ID was passed in URL, filter on that
     // otherwise filter on all sets as defined on set field.
     if ($set) {
-      $this->set_ids = [$set];
       $query->condition('m.set_id', $set);
     }
 
